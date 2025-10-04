@@ -1,0 +1,31 @@
+@model Curso
+
+@{
+    ViewData["Title"] = "Detalle del Curso";
+}
+
+<h2>@Model.Nombre</h2>
+
+<div class="card">
+    <div class="card-body">
+        <p><strong>Código:</strong> @Model.Codigo</p>
+        <p><strong>Créditos:</strong> @Model.Creditos</p>
+        <p><strong>Horario:</strong> @Model.HorarioInicio.ToString(@"hh\:mm") - @Model.HorarioFin.ToString(@"hh\:mm")</p>
+        <p><strong>Cupo máximo:</strong> @Model.CupoMaximo</p>
+        
+        @if (User.Identity.IsAuthenticated)
+        {
+            <form method="post" action="@Url.Action("Inscribir", "Matriculas")">
+                <input type="hidden" name="cursoId" value="@Model.Id" />
+                <button type="submit" class="btn btn-success">Inscribirse</button>
+            </form>
+        }
+        else
+        {
+            <a href="@Url.Page("/Account/Login", new { area = "Identity" })" 
+               class="btn btn-primary">Iniciar sesión para inscribirse</a>
+        }
+        
+        <a href="@Url.Action("Catalogo")" class="btn btn-secondary mt-2">Volver al catálogo</a>
+    </div>
+</div>

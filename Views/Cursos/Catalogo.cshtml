@@ -1,0 +1,65 @@
+@model CatalogoViewModel
+
+@{
+    ViewData["Title"] = "Catálogo de Cursos";
+}
+
+<h2>Catálogo de Cursos</h2>
+
+<form method="get">
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <input type="text" name="NombreFiltro" value="@Model.NombreFiltro" 
+                   class="form-control" placeholder="Nombre del curso">
+        </div>
+        <div class="col-md-2">
+            <input type="number" name="CreditosMin" value="@Model.CreditosMin" 
+                   class="form-control" placeholder="Créditos mínimos" min="1">
+        </div>
+        <div class="col-md-2">
+            <input type="number" name="CreditosMax" value="@Model.CreditosMax" 
+                   class="form-control" placeholder="Créditos máximos" min="1">
+        </div>
+        <div class="col-md-2">
+            <input type="time" name="HorarioDesde" 
+                value="@(Model.HorarioDesde.HasValue && Model.HorarioDesde.Value != TimeSpan.Zero ? Model.HorarioDesde.Value.ToString(@"hh\:mm") : "")" 
+                class="form-control" placeholder="Desde">
+        </div>
+        <div class="col-md-2">
+            <input type="time" name="HorarioHasta" 
+                value="@(Model.HorarioHasta.HasValue && Model.HorarioHasta.Value != TimeSpan.Zero ? Model.HorarioHasta.Value.ToString(@"hh\:mm") : "")" 
+                class="form-control" placeholder="Hasta">
+        </div>
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </div>
+</form>
+
+<div class="row">
+    @foreach (var curso in Model.Cursos)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@curso.Nombre</h5>
+                    <p class="card-text">
+                        <strong>Código:</strong> @curso.Codigo<br>
+                        <strong>Créditos:</strong> @curso.Creditos<br>
+                        <strong>Horario:</strong> @curso.HorarioInicio.ToString(@"hh\:mm") - @curso.HorarioFin.ToString(@"hh\:mm")<br>
+                        <strong>Cupo:</strong> @curso.CupoMaximo
+                    </p>
+                    <a href="@Url.Action("Detalle", new { id = curso.Id })" 
+                       class="btn btn-primary">Ver Detalles</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Cursos.Any())
+{
+    <div class="alert alert-info">
+        No se encontraron cursos con los filtros aplicados.
+    </div>
+}
