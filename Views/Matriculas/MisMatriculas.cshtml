@@ -2,78 +2,118 @@
 
 @{
     ViewData["Title"] = "Mis Matrículas";
+    
+    // Estadísticas para el resumen
+    var totalMatriculas = Model.Count;
+    var confirmadas = Model.Count(m => m.Estado == EstadoMatricula.Confirmada);
+    var pendientes = Model.Count(m => m.Estado == EstadoMatricula.Pendiente);
+    var canceladas = Model.Count(m => m.Estado == EstadoMatricula.Cancelada);
 }
 
-<h2>Mis Matrículas</h2>
-
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-
-@if (!Model.Any())
-{
-    <div class="alert alert-info">
-        No tiene matrículas registradas.
-        <a href="@Url.Action("Catalogo", "Cursos")" class="alert-link">Explorar cursos disponibles</a>
+<div class="matriculas-container">
+    <div class="matriculas-header">
+        <h2>📋 Mis Matrículas</h2>
     </div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Curso</th>
-                    <th>Código</th>
-                    <th>Fecha de Registro</th>
-                    <th>Estado</th>
-                    <th>Horario</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var matricula in Model)
-                {
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">✅ @TempData["Success"]</div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">❌ @TempData["Error"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <div class="icon">📭</div>
+            <h3>No tienes matrículas registradas</h3>
+            <p>Explora nuestro catálogo de cursos y encuentra el perfecto para ti.</p>
+            <a href="@Url.Action("Catalogo", "Cursos")" class="btn btn-primary">
+                <span>🔍</span> Explorar Cursos
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- Resumen de matrículas -->
+        <div class="resumen-matriculas">
+            <h4>📊 Resumen de Matrículas</h4>
+            <div class="resumen-stats">
+                <div class="stat-item">
+                    <span class="stat-number">@totalMatriculas</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">@confirmadas</span>
+                    <span class="stat-label">Confirmadas</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">@pendientes</span>
+                    <span class="stat-label">Pendientes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">@canceladas</span>
+                    <span class="stat-label">Canceladas</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de matrículas -->
+        <div class="table-responsive">
+            <table class="table enhanced-table">
+                <thead>
                     <tr>
-                        <td>@(matricula.Curso?.Nombre ?? "N/A")</td>
-                        <td>@(matricula.Curso?.Codigo ?? "N/A")</td>
-                        <td>@matricula.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
-                        <td>
-                            @switch (matricula.Estado)
-                            {
-                                case EstadoMatricula.Pendiente:
-                                    <span class="badge bg-warning">Pendiente</span>
-                                    break;
-                                case EstadoMatricula.Confirmada:
-                                    <span class="badge bg-success">Confirmada</span>
-                                    break;
-                                case EstadoMatricula.Cancelada:
-                                    <span class="badge bg-danger">Cancelada</span>
-                                    break;
-                            }
-                        </td>
-                        <td>
-                            @if (matricula.Curso != null)
-                            {
-                                @($"{matricula.Curso.HorarioInicio:hh\\:mm} - {matricula.Curso.HorarioFin:hh\\:mm}")
-                            }
-                            else
-                            {
-                                <text>N/A</text>
-                            }
-                        </td>
+                        <th>Curso</th>
+                        <th>Código</th>
+                        <th>Fecha de Registro</th>
+                        <th>Estado</th>
+                        <th>Horario</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
+                </thead>
+                <tbody>
+                    @foreach (var matricula in Model)
+                    {
+                        <tr>
+                            <td data-label="Curso">@(matricula.Curso?.Nombre ?? "N/A")</td>
+                            <td data-label="Código">@(matricula.Curso?.Codigo ?? "N/A")</td>
+                            <td data-label="Fecha de Registro">@matricula.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td data-label="Estado">
+                                @switch (matricula.Estado)
+                                {
+                                    case EstadoMatricula.Pendiente:
+                                        <span class="badge bg-warning">Pendiente</span>
+                                        break;
+                                    case EstadoMatricula.Confirmada:
+                                        <span class="badge bg-success">Confirmada</span>
+                                        break;
+                                    case EstadoMatricula.Cancelada:
+                                        <span class="badge bg-danger">Cancelada</span>
+                                        break;
+                                }
+                            </td>
+                            <td data-label="Horario">
+                                @if (matricula.Curso != null)
+                                {
+                                    @($"{matricula.Curso.HorarioInicio:hh\\:mm} - {matricula.Curso.HorarioFin:hh\\:mm}")
+                                }
+                                else
+                                {
+                                    <text>N/A</text>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 
-<div class="mt-3">
-    <a href="@Url.Action("Catalogo", "Cursos")" class="btn btn-primary">Volver al Catálogo</a>
+    <div class="text-center">
+        <a href="@Url.Action("Catalogo", "Cursos")" class="btn btn-primary">
+            <span>📚</span> Volver al Catálogo
+        </a>
+    </div>
 </div>

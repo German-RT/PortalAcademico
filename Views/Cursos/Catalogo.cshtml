@@ -4,63 +4,82 @@
     ViewData["Title"] = "Catálogo de Cursos";
 }
 
-<h2>Catálogo de Cursos</h2>
-
-<form method="get">
-    <div class="row mb-3">
-        <div class="col-md-3">
-            <input type="text" name="NombreFiltro" value="@Model.NombreFiltro" 
-                   class="form-control" placeholder="Nombre del curso">
-        </div>
-        <div class="col-md-2">
-            <input type="number" name="CreditosMin" value="@Model.CreditosMin" 
-                   class="form-control" placeholder="Créditos mínimos" min="1">
-        </div>
-        <div class="col-md-2">
-            <input type="number" name="CreditosMax" value="@Model.CreditosMax" 
-                   class="form-control" placeholder="Créditos máximos" min="1">
-        </div>
-        <div class="col-md-2">
-            <input type="time" name="HorarioDesde" 
-                value="@(Model.HorarioDesde.HasValue && Model.HorarioDesde.Value != TimeSpan.Zero ? Model.HorarioDesde.Value.ToString(@"hh\:mm") : "")" 
-                class="form-control" placeholder="Desde">
-        </div>
-        <div class="col-md-2">
-            <input type="time" name="HorarioHasta" 
-                value="@(Model.HorarioHasta.HasValue && Model.HorarioHasta.Value != TimeSpan.Zero ? Model.HorarioHasta.Value.ToString(@"hh\:mm") : "")" 
-                class="form-control" placeholder="Hasta">
-        </div>
-        <div class="col-md-1">
-            <button type="submit" class="btn btn-primary">Filtrar</button>
-        </div>
+<div class="catalogo-container">
+    <div class="catalogo-header">
+        <h2>📚 Catálogo de Cursos</h2>
     </div>
-</form>
 
-<div class="row">
-    @foreach (var curso in Model.Cursos)
-    {
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">@curso.Nombre</h5>
-                    <p class="card-text">
-                        <strong>Código:</strong> @curso.Codigo<br>
-                        <strong>Créditos:</strong> @curso.Creditos<br>
-                        <strong>Horario:</strong> @curso.HorarioInicio.ToString(@"hh\:mm") - @curso.HorarioFin.ToString(@"hh\:mm")<br>
-                        <strong>Cupo:</strong> @curso.CupoMaximo
-                        @* Nota: Los cupos ocupados no se muestran desde cache *@
-                    </p>
-                    <a href="@Url.Action("Detalle", new { id = curso.Id })" 
-                    class="btn btn-primary">Ver Detalles</a>
+    <div class="filtros-container">
+        <form method="get">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Nombre del curso</label>
+                    <input type="text" name="NombreFiltro" value="@Model.NombreFiltro" 
+                           class="form-control" placeholder="Buscar por nombre...">
                 </div>
+                <div class="col-md-2">
+                    <label class="form-label">Créditos mín.</label>
+                    <input type="number" name="CreditosMin" value="@Model.CreditosMin" 
+                           class="form-control" placeholder="Mín" min="1">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Créditos máx.</label>
+                    <input type="number" name="CreditosMax" value="@Model.CreditosMax" 
+                           class="form-control" placeholder="Máx" min="1">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Horario desde</label>
+                    <input type="time" name="HorarioDesde" 
+                        value="@(Model.HorarioDesde.HasValue && Model.HorarioDesde.Value != TimeSpan.Zero ? Model.HorarioDesde.Value.ToString(@"hh\:mm") : "")" 
+                        class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Horario hasta</label>
+                    <input type="time" name="HorarioHasta" 
+                        value="@(Model.HorarioHasta.HasValue && Model.HorarioHasta.Value != TimeSpan.Zero ? Model.HorarioHasta.Value.ToString(@"hh\:mm") : "")" 
+                        class="form-control">
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">
+                        <span>🔍</span> Filtrar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        @foreach (var curso in Model.Cursos)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="curso-card">
+                    <div class="card-body">
+                        <h5 class="card-title">@curso.Nombre</h5>
+                        <p class="card-text">
+                            <strong>Código:</strong> @curso.Codigo<br>
+                            <strong>Créditos:</strong> @curso.Creditos<br>
+                            <strong>Horario:</strong> @curso.HorarioInicio.ToString(@"hh\:mm") - @curso.HorarioFin.ToString(@"hh\:mm")<br>
+                            <strong>Cupo:</strong> @curso.CupoMaximo
+                        </p>
+                        <div class="mt-auto">
+                            <a href="@Url.Action("Detalle", new { id = curso.Id })" 
+                            class="btn btn-primary w-100">
+                                <span>👁️</span> Ver Detalles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!Model.Cursos.Any())
+    {
+        <div class="alert alert-info">
+            <div class="text-center">
+                <h5>📭 No se encontraron cursos</h5>
+                <p class="mb-0">Intenta ajustar los filtros de búsqueda.</p>
             </div>
         </div>
     }
 </div>
-
-@if (!Model.Cursos.Any())
-{
-    <div class="alert alert-info">
-        No se encontraron cursos con los filtros aplicados.
-    </div>
-}

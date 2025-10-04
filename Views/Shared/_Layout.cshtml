@@ -30,6 +30,14 @@
                                 <a class="nav-link text-dark" href="@Url.Action("MisMatriculas", "Matriculas")">Mis Matrículas</a>
                             </li>
                             
+                            <!-- ✅ ENLACE PARA COORDINADOR -->
+                            @if (User.IsInRole("Coordinador"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" href="@Url.Action("Index", "Coordinador")">👨‍🏫 Panel Coordinador</a>
+                                </li>
+                            }
+                            
                             <!-- Mostrar último curso visitado -->
                             @if (Context.Session.GetString("UltimoCursoVisitado") != null)
                             {
