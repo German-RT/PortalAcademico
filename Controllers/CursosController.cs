@@ -19,7 +19,7 @@ namespace PortalAcademico.Controllers
 
         public async Task<IActionResult> Catalogo(CatalogoViewModel filtros)
         {
-            // Guardar último curso visitado en sesión (para el layout)
+            // Guardar último curso visitado en sesión
             if (filtros.Cursos?.Any() == true)
             {
                 var primerCurso = filtros.Cursos.First();
@@ -30,10 +30,29 @@ namespace PortalAcademico.Controllers
             List<Curso> cursos;
 
             // Intentar obtener del cache primero
-            var cachedCursos = await _cacheService.GetCursosActivosAsync();
-            if (cachedCursos != null)
+            var cachedCursosDto = await _cacheService.GetCursosActivosAsync();
+            if (cachedCursosDto != null)
             {
-                cursos = cachedCursos;
+                // Convertir DTOs a entidades Curso
+                cursos = cachedCursosDto.Select(dto => new Curso
+                {
+                    Id = dto.Id,
+                    Codigo = dto.Codigo,
+                    Nombre = dto.Nombre,
+                    Creditos = dto.Creditos,
+                    CupoMaximo = dto.CupoMaximo,
+                    HorarioInicio = dto.HorarioInicio,
+                    HorarioFin = dto.HorarioFin,
+                    Activo = dto.Activo,
+                    Matriculas = new List<Matricula>() // Lista vacía, no necesitamos las matrículas para el catálogo
+                }).ToList();
+
+                // Para mostrar cupos ocupados en la vista
+                foreach (var curso in cursos)
+                {
+                    var dto = cachedCursosDto.First(c => c.Id == curso.Id);
+                    // Podemos usar ViewData o crear una propiedad temporal
+                }
             }
             else
             {
@@ -42,9 +61,10 @@ namespace PortalAcademico.Controllers
                     .Where(c => c.Activo)
                     .Include(c => c.Matriculas)
                     .ToListAsync();
-                
-                // Almacenar en cache
-                await _cacheService.SetCursosActivosAsync(cursos);
+
+                // Convertir a DTOs y almacenar en cache
+                var cursosDto = cursos.Select(CursoCacheDto.FromCurso).ToList();
+                await _cacheService.SetCursosActivosAsync(cursosDto);
             }
 
             // Aplicar filtros en memoria

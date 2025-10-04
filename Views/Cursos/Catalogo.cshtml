@@ -48,9 +48,10 @@
                         <strong>Créditos:</strong> @curso.Creditos<br>
                         <strong>Horario:</strong> @curso.HorarioInicio.ToString(@"hh\:mm") - @curso.HorarioFin.ToString(@"hh\:mm")<br>
                         <strong>Cupo:</strong> @curso.CupoMaximo
+                        @* Nota: Los cupos ocupados no se muestran desde cache *@
                     </p>
-                    <a href="@Url.Action("Detalle", "Cursos", new { id = curso.Id })" 
-                        class="btn btn-primary">Ver Detalles</a>
+                    <a href="@Url.Action("Detalle", new { id = curso.Id })" 
+                    class="btn btn-primary">Ver Detalles</a>
                 </div>
             </div>
         </div>
