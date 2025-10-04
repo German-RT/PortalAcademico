@@ -15,10 +15,15 @@ namespace PortalAcademico.Data
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            // Crear rol Coordinador
-            if (!await roleManager.RoleExistsAsync("Coordinador"))
+            // Crear roles si no existen
+            string[] roleNames = { "Coordinador", "Estudiante" };
+            
+            foreach (var roleName in roleNames)
             {
-                await roleManager.CreateAsync(new IdentityRole("Coordinador"));
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
             }
 
             // Crear usuario coordinador
@@ -36,6 +41,31 @@ namespace PortalAcademico.Data
                 
                 await userManager.CreateAsync(coordinador, "Password123!");
                 await userManager.AddToRoleAsync(coordinador, "Coordinador");
+            }
+            else
+            {
+                // Asegurar que tenga el rol
+                if (!await userManager.IsInRoleAsync(coordinador, "Coordinador"))
+                {
+                    await userManager.AddToRoleAsync(coordinador, "Coordinador");
+                }
+            }
+
+            // Crear usuario estudiante de ejemplo
+            var estudianteEmail = "estudiante@universidad.edu";
+            var estudiante = await userManager.FindByEmailAsync(estudianteEmail);
+            
+            if (estudiante == null)
+            {
+                estudiante = new IdentityUser 
+                { 
+                    UserName = estudianteEmail, 
+                    Email = estudianteEmail,
+                    EmailConfirmed = true
+                };
+                
+                await userManager.CreateAsync(estudiante, "Password123!");
+                await userManager.AddToRoleAsync(estudiante, "Estudiante");
             }
 
             // Crear cursos de ejemplo
