@@ -33,6 +33,8 @@ builder.Services.AddControllersWithViews();
 // ✅ ESTA ES LA LÍNEA QUE FALTA:
 builder.Services.AddScoped<ICacheService, CacheService>();
 
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -75,6 +77,24 @@ catch (Exception ex)
 {
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
     logger.LogError(ex, "An error occurred while seeding the database.");
+}
+
+// Antes de app.Run();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate(); // Ejecuta migraciones automáticamente
+        
+        await SeedData.Initialize(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred seeding the DB.");
+    }
 }
 
 app.Run();
