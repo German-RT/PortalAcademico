@@ -4,65 +4,77 @@
     ViewData["Title"] = "Crear Nuevo Curso";
 }
 
-<h2>➕ Crear Nuevo Curso</h2>
-
-<form method="post">
-    @Html.AntiForgeryToken()
-    
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group mb-3">
-                <label asp-for="Codigo" class="form-label"></label>
-                <input asp-for="Codigo" class="form-control" />
-                <span asp-validation-for="Codigo" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Nombre" class="form-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Creditos" class="form-label"></label>
-                <input asp-for="Creditos" class="form-control" min="1" max="10" />
-                <span asp-validation-for="Creditos" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="CupoMaximo" class="form-label"></label>
-                <input asp-for="CupoMaximo" class="form-control" min="1" max="100" />
-                <span asp-validation-for="CupoMaximo" class="text-danger"></span>
-            </div>
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h2>➕ Crear Nuevo Curso</h2>
         </div>
+        
+        <div class="form-body">
+            <form method="post">
+                @Html.AntiForgeryToken()
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Codigo" class="form-label">CÓDIGO DEL CURSO</label>
+                            <input asp-for="Codigo" class="form-control" placeholder="Ej: MAT101" />
+                            <span asp-validation-for="Codigo" class="text-danger"></span>
+                        </div>
 
-        <div class="col-md-6">
-            <div class="form-group mb-3">
-                <label asp-for="HorarioInicio" class="form-label"></label>
-                <input asp-for="HorarioInicio" type="time" class="form-control" />
-                <span asp-validation-for="HorarioInicio" class="text-danger"></span>
-            </div>
+                        <div class="form-group">
+                            <label asp-for="Nombre" class="form-label">NOMBRE DEL CURSO</label>
+                            <input asp-for="Nombre" class="form-control" placeholder="Ej: Matemáticas Básicas" />
+                            <span asp-validation-for="Nombre" class="text-danger"></span>
+                        </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="HorarioFin" class="form-label"></label>
-                <input asp-for="HorarioFin" type="time" class="form-control" />
-                <span asp-validation-for="HorarioFin" class="text-danger"></span>
-            </div>
+                        <div class="form-group">
+                            <label asp-for="Creditos" class="form-label">CRÉDITOS</label>
+                            <input asp-for="Creditos" class="form-control" min="1" max="10" />
+                            <span asp-validation-for="Creditos" class="text-danger"></span>
+                        </div>
 
-            <div class="form-group mb-3">
-                <div class="form-check">
-                    <input asp-for="Activo" class="form-check-input" />
-                    <label asp-for="Activo" class="form-check-label"></label>
+                        <div class="form-group">
+                            <label asp-for="CupoMaximo" class="form-label">CUPO MÁXIMO</label>
+                            <input asp-for="CupoMaximo" class="form-control" min="1" max="100" />
+                            <span asp-validation-for="CupoMaximo" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="HorarioInicio" class="form-label">HORA DE INICIO</label>
+                            <input asp-for="HorarioInicio" type="time" class="form-control" />
+                            <span asp-validation-for="HorarioInicio" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="HorarioFin" class="form-label">HORA DE FINALIZACIÓN</label>
+                            <input asp-for="HorarioFin" type="time" class="form-control" />
+                            <span asp-validation-for="HorarioFin" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input asp-for="Activo" class="form-check-input" />
+                                <label asp-for="Activo" class="form-check-label">CURSO ACTIVO</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <span>💾</span> Crear Curso
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <span>←</span> Volver al Panel
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
-
-    <div class="form-group">
-        <button type="submit" class="btn btn-success">💾 Crear Curso</button>
-        <a href="@Url.Action("Index")" class="btn btn-secondary">← Volver al Panel</a>
-    </div>
-</form>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

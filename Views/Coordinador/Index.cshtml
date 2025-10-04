@@ -4,128 +4,173 @@
     ViewData["Title"] = "Panel de Coordinador";
 }
 
-<h2>👨‍🏫 Panel de Coordinador</h2>
+<div class="panel-container">
+    <div class="panel-header">
+        <h2>👨‍🏫 Panel de Coordinador</h2>
+    </div>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">✅ @TempData["Success"]</div>
+    }
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">❌ @TempData["Error"]</div>
+    }
 
-<div class="row">
-    <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5>📚 Gestión de Cursos</h5>
-                <a href="@Url.Action("CrearCurso")" class="btn btn-success btn-sm">➕ Nuevo Curso</a>
-            </div>
-            <div class="card-body">
-                @if (!Model.Cursos.Any())
-                {
-                    <p class="text-muted">No hay cursos registrados.</p>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Código</th>
-                                    <th>Nombre</th>
-                                    <th>Créditos</th>
-                                    <th>Cupo</th>
-                                    <th>Horario</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var curso in Model.Cursos)
-                                {
+    <div class="row">
+        <div class="col-md-8">
+            <div class="enhanced-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>📚 Gestión de Cursos</h5>
+                    <a href="@Url.Action("CrearCurso")" class="btn btn-success">
+                        <span>➕</span> Nuevo Curso
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Cursos.Any())
+                    {
+                        <div class="text-center py-4">
+                            <p class="text-muted">No hay cursos registrados.</p>
+                            <a href="@Url.Action("CrearCurso")" class="btn btn-primary mt-2">Crear Primer Curso</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped enhanced-table">
+                                <thead>
                                     <tr>
-                                        <td>@curso.Codigo</td>
-                                        <td>@curso.Nombre</td>
-                                        <td>@curso.Creditos</td>
-                                        <td>@(curso.Matriculas?.Count(m => m.Estado == EstadoMatricula.Confirmada) ?? 0)/@curso.CupoMaximo</td>
-                                        <td>@curso.HorarioInicio.ToString(@"hh\:mm") - @curso.HorarioFin.ToString(@"hh\:mm")</td>
-                                        <td>
-                                            @if (curso.Activo)
-                                            {
-                                                <span class="badge bg-success">Activo</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-secondary">Inactivo</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm">
-                                                <a href="@Url.Action("EditarCurso", new { id = curso.Id })" class="btn btn-outline-primary">✏️ Editar</a>
+                                        <th>Código</th>
+                                        <th>Nombre</th>
+                                        <th>Créditos</th>
+                                        <th>Cupo</th>
+                                        <th>Horario</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var curso in Model.Cursos)
+                                    {
+                                        <tr>
+                                            <td><strong>@curso.Codigo</strong></td>
+                                            <td>@curso.Nombre</td>
+                                            <td>@curso.Creditos</td>
+                                            <td>
+                                                <span class="badge bg-info text-dark">
+                                                    @(curso.Matriculas?.Count(m => m.Estado == EstadoMatricula.Confirmada) ?? 0)/@curso.CupoMaximo
+                                                </span>
+                                            </td>
+                                            <td>@curso.HorarioInicio.ToString(@"hh\:mm") - @curso.HorarioFin.ToString(@"hh\:mm")</td>
+                                            <td>
                                                 @if (curso.Activo)
                                                 {
-                                                    <form method="post" action="@Url.Action("DesactivarCurso", new { id = curso.Id })" class="d-inline">
-                                                        @Html.AntiForgeryToken()
-                                                        <button type="submit" class="btn btn-outline-warning" onclick="return confirm('¿Desactivar este curso?')">🚫 Desactivar</button>
-                                                    </form>
+                                                    <span class="badge bg-success">Activo</span>
                                                 }
                                                 else
                                                 {
-                                                    <form method="post" action="@Url.Action("ActivarCurso", new { id = curso.Id })" class="d-inline">
-                                                        @Html.AntiForgeryToken()
-                                                        <button type="submit" class="btn btn-outline-success">✅ Activar</button>
-                                                    </form>
+                                                    <span class="badge bg-secondary">Inactivo</span>
                                                 }
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="@Url.Action("EditarCurso", new { id = curso.Id })" 
+                                                       class="btn btn-outline-primary" 
+                                                       title="Editar curso">
+                                                        ✏️ Editar
+                                                    </a>
+                                                    @if (curso.Activo)
+                                                    {
+                                                        <form method="post" 
+                                                              action="@Url.Action("DesactivarCurso", new { id = curso.Id })" 
+                                                              class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" 
+                                                                    class="btn btn-outline-warning" 
+                                                                    onclick="return confirm('¿Está seguro de desactivar este curso?')"
+                                                                    title="Desactivar curso">
+                                                                🚫 Desactivar
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    else
+                                                    {
+                                                        <form method="post" 
+                                                              action="@Url.Action("ActivarCurso", new { id = curso.Id })" 
+                                                              class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" 
+                                                                    class="btn btn-outline-success"
+                                                                    title="Activar curso">
+                                                                ✅ Activar
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5>📋 Matrículas Pendientes</h5>
-            </div>
-            <div class="card-body">
-                @if (!Model.MatriculasPendientes.Any())
-                {
-                    <p class="text-muted">No hay matrículas pendientes.</p>
-                }
-                else
-                {
-                    <div class="list-group">
-                        @foreach (var matricula in Model.MatriculasPendientes)
-                        {
-                            <div class="list-group-item">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">@matricula.Usuario?.UserName</h6>
-                                    <small>@matricula.FechaRegistro.ToString("dd/MM")</small>
+        <div class="col-md-4">
+            <div class="enhanced-card">
+                <div class="card-header">
+                    <h5>📋 Matrículas Pendientes</h5>
+                </div>
+                <div class="card-body">
+                    @if (!Model.MatriculasPendientes.Any())
+                    {
+                        <div class="text-center py-3">
+                            <p class="text-muted">No hay matrículas pendientes.</p>
+                            <span class="text-success">🎉 Todo al día</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group enhanced-list-group">
+                            @foreach (var matricula in Model.MatriculasPendientes)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between align-items-start">
+                                        <h6 class="mb-1">@matricula.Usuario?.UserName</h6>
+                                        <small class="text-muted">@matricula.FechaRegistro.ToString("dd/MM/yyyy")</small>
+                                    </div>
+                                    <p class="mb-2">@matricula.Curso?.Nombre</p>
+                                    <div class="btn-group btn-group-sm w-100">
+                                        <form method="post" 
+                                              action="@Url.Action("ConfirmarMatricula", new { id = matricula.Id })" 
+                                              class="flex-fill">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" 
+                                                    class="btn btn-success w-100"
+                                                    title="Confirmar matrícula">
+                                                ✅ Confirmar
+                                            </button>
+                                        </form>
+                                        <form method="post" 
+                                              action="@Url.Action("CancelarMatricula", new { id = matricula.Id })" 
+                                              class="flex-fill">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" 
+                                                    class="btn btn-danger w-100"
+                                                    title="Cancelar matrícula">
+                                                ❌ Cancelar
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
-                                <p class="mb-1">@matricula.Curso?.Nombre</p>
-                                <div class="btn-group btn-group-sm">
-                                    <form method="post" action="@Url.Action("ConfirmarMatricula", new { id = matricula.Id })" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-success btn-sm">✅ Confirmar</button>
-                                    </form>
-                                    <form method="post" action="@Url.Action("CancelarMatricula", new { id = matricula.Id })" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-danger btn-sm">❌ Cancelar</button>
-                                    </form>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
+                            }
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
