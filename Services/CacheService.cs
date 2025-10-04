@@ -6,8 +6,8 @@ namespace PortalAcademico.Services
 {
     public interface ICacheService
     {
-        Task<List<Curso>?> GetCursosActivosAsync();
-        Task SetCursosActivosAsync(List<Curso> cursos);
+        Task<List<CursoCacheDto>?> GetCursosActivosAsync();
+        Task SetCursosActivosAsync(List<CursoCacheDto> cursos);
         Task RemoveCursosActivosAsync();
     }
 
@@ -16,7 +16,7 @@ namespace PortalAcademico.Services
         private readonly IDistributedCache _cache;
         private readonly ILogger<CacheService> _logger;
         private const string CURSOS_ACTIVOS_KEY = "cursos_activos";
-        private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(1); // 60 segundos como pide el examen
+        private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(1);
 
         public CacheService(IDistributedCache cache, ILogger<CacheService> logger)
         {
@@ -24,28 +24,28 @@ namespace PortalAcademico.Services
             _logger = logger;
         }
 
-        public async Task<List<Curso>?> GetCursosActivosAsync()
+        public async Task<List<CursoCacheDto>?> GetCursosActivosAsync()
         {
             try
             {
                 var cachedData = await _cache.GetStringAsync(CURSOS_ACTIVOS_KEY);
                 if (string.IsNullOrEmpty(cachedData))
                 {
-                    _logger.LogInformation("Cache miss para cursos activos");
+                    _logger.LogInformation("❌ CACHE MISS - No se encontraron cursos en cache");
                     return null;
                 }
 
-                _logger.LogInformation("Cache hit para cursos activos");
-                return JsonSerializer.Deserialize<List<Curso>>(cachedData);
+                _logger.LogInformation("✅ CACHE HIT - Cursos obtenidos desde cache");
+                return JsonSerializer.Deserialize<List<CursoCacheDto>>(cachedData);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al obtener cursos activos del cache");
+                _logger.LogError(ex, "💥 ERROR al obtener cursos activos del cache");
                 return null;
             }
         }
 
-        public async Task SetCursosActivosAsync(List<Curso> cursos)
+        public async Task SetCursosActivosAsync(List<CursoCacheDto> cursos)
         {
             try
             {
@@ -56,11 +56,12 @@ namespace PortalAcademico.Services
 
                 var serializedData = JsonSerializer.Serialize(cursos);
                 await _cache.SetStringAsync(CURSOS_ACTIVOS_KEY, serializedData, options);
-                _logger.LogInformation("Cursos activos almacenados en cache por {Duration} minutos", _cacheDuration.TotalMinutes);
+                _logger.LogInformation("💾 CACHE SET - {Count} cursos almacenados en cache por {Duration} segundos", 
+                    cursos.Count, _cacheDuration.TotalSeconds);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al almacenar cursos activos en cache");
+                _logger.LogError(ex, "💥 ERROR al almacenar cursos activos en cache");
             }
         }
 
@@ -69,11 +70,11 @@ namespace PortalAcademico.Services
             try
             {
                 await _cache.RemoveAsync(CURSOS_ACTIVOS_KEY);
-                _logger.LogInformation("Cache de cursos activos invalidado");
+                _logger.LogInformation("🗑️ CACHE INVALIDADO - Cache de cursos activos eliminado");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al invalidar cache de cursos activos");
+                _logger.LogError(ex, "💥 ERROR al invalidar cache de cursos activos");
             }
         }
     }
