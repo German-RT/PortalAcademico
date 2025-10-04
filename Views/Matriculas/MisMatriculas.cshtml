@@ -1,0 +1,79 @@
+@model List<Matricula>
+
+@{
+    ViewData["Title"] = "Mis Matrículas";
+}
+
+<h2>Mis Matrículas</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No tiene matrículas registradas.
+        <a href="@Url.Action("Catalogo", "Cursos")" class="alert-link">Explorar cursos disponibles</a>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    <th>Código</th>
+                    <th>Fecha de Registro</th>
+                    <th>Estado</th>
+                    <th>Horario</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var matricula in Model)
+                {
+                    <tr>
+                        <td>@(matricula.Curso?.Nombre ?? "N/A")</td>
+                        <td>@(matricula.Curso?.Codigo ?? "N/A")</td>
+                        <td>@matricula.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            @switch (matricula.Estado)
+                            {
+                                case EstadoMatricula.Pendiente:
+                                    <span class="badge bg-warning">Pendiente</span>
+                                    break;
+                                case EstadoMatricula.Confirmada:
+                                    <span class="badge bg-success">Confirmada</span>
+                                    break;
+                                case EstadoMatricula.Cancelada:
+                                    <span class="badge bg-danger">Cancelada</span>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            @if (matricula.Curso != null)
+                            {
+                                @($"{matricula.Curso.HorarioInicio:hh\\:mm} - {matricula.Curso.HorarioFin:hh\\:mm}")
+                            }
+                            else
+                            {
+                                <text>N/A</text>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="mt-3">
+    <a href="@Url.Action("Catalogo", "Cursos")" class="btn btn-primary">Volver al Catálogo</a>
+</div>
