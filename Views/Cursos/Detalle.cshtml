@@ -1,0 +1,77 @@
+@model Curso
+
+@{
+    ViewData["Title"] = "Detalle del Curso";
+}
+
+<h2>@Model.Nombre</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <p><strong>Código:</strong> @Model.Codigo</p>
+        <p><strong>Créditos:</strong> @Model.Creditos</p>
+        <p><strong>Horario:</strong> @Model.HorarioInicio.ToString(@"hh\:mm") - @Model.HorarioFin.ToString(@"hh\:mm")</p>
+        <p><strong>Cupo disponible:</strong> 
+            @{
+                var cuposOcupados = Model.Matriculas?.Count(m => m.Estado == EstadoMatricula.Confirmada) ?? 0;
+                var cuposDisponibles = Model.CupoMaximo - cuposOcupados;
+            }
+            @cuposDisponibles / @Model.CupoMaximo
+        </p>
+        
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <form method="post" action="@Url.Action("Inscribir", "Matriculas")">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="cursoId" value="@Model.Id" />
+                
+                @{
+                    var usuarioId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                    var yaInscrito = Model.Matriculas?.Any(m => m.UsuarioId == usuarioId) ?? false;
+                }
+                
+                @if (yaInscrito)
+                {
+                    <div class="alert alert-info">
+                        Ya está inscrito en este curso.
+                        <a href="@Url.Action("MisMatriculas", "Matriculas")" class="alert-link">Ver mis matrículas</a>
+                    </div>
+                }
+                else if (cuposDisponibles <= 0)
+                {
+                    <button type="button" class="btn btn-secondary" disabled>
+                        Cupo Agotado
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-success">Inscribirse en este curso</button>
+                }
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                Debe <a href="@Url.Page("/Account/Login", new { area = "Identity", returnUrl = Context.Request.Path })" class="alert-link">iniciar sesión</a> para inscribirse en el curso.
+            </div>
+        }
+        
+        <div class="mt-3">
+            <a href="@Url.Action("Catalogo", "Cursos")" class="btn btn-secondary">Volver al Catálogo</a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a href="@Url.Action("MisMatriculas", "Matriculas")" class="btn btn-outline-primary">Ver Mis Matrículas</a>
+            }
+        </div>
+    </div>
+</div>
