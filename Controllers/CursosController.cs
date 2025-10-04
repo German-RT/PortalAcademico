@@ -55,14 +55,15 @@ namespace PortalAcademico.Controllers
         public async Task<IActionResult> Detalle(int id)
         {
             var curso = await _context.Cursos
+                .Include(c => c.Matriculas) // Asegúrate de incluir las matrículas
                 .FirstOrDefaultAsync(c => c.Id == id && c.Activo);
-                
+
             if (curso == null)
             {
                 return NotFound();
             }
 
-            return View(curso);
+            return View(curso); // Esto debería renderizar Views/Cursos/Detalle.cshtml
         }
     }
 }
